@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import styled from "styled-components";
 import * as yup from "yup";
 import axios from "axios";
+import prependDeep from "yup/lib/util/prependDeep";
 
 //setup some styles
 const FormContainer = styled.div`
@@ -34,7 +35,7 @@ export default function Form(props) {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        password: "",
+        password: "",//varbad. No store password this way.
         tos: false
     });
     const [errorState, setErrorState] = useState({
@@ -43,6 +44,7 @@ export default function Form(props) {
         password: "",
         tos: "",
     });
+    const [users, setUsers] = useState([]);
 
     //validate user input
     function validate(event){
@@ -68,9 +70,12 @@ export default function Form(props) {
         //todo: might be worth validating here and in handle change. What if the user never types anything? can't they still post then?
         event.preventDefault();
         console.log("form submitted successfully~");
-        //todo: axios post here
         axios.post("https://reqres.in/api/users", formData)
-            .then(response => console.log(response))
+            .then(response => {
+                console.log(response);
+                //<pre>{JSON.stringify(post, null, 2)}</pre>
+                props.setUsers([...props.users, JSON.stringify(response.data, null, 2)]);
+            })
             .catch(err => console.log(err));
     }
 
