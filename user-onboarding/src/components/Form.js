@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import * as yup from "yup";
 import axios from "axios";
@@ -45,6 +45,16 @@ export default function Form(props) {
         tos: "",
     });
     const [users, setUsers] = useState([]);
+
+    //set button abled/disabled
+    const [buttonDisabled, setButtonDisabled] = useState(true);
+    // Everytime formState changes, check to see if it passes verification.
+    // If it does, then enable the submit button, otherwise disable
+    useEffect(() => {
+        formSchema.isValid(formData).then(valid => {
+            setButtonDisabled(!valid);
+        });
+    }, [formData]);
 
     //validate user input
     function validate(event){
@@ -98,6 +108,9 @@ export default function Form(props) {
                     onChange={handleChange}
 
                 />
+                {errorState.name.length > 0 ? (
+                    <ErrP className="error">{errorState.name}</ErrP>
+                ) : null}
                 <label htmlFor="email">Email:</label>
                 <input
                     type="text"
@@ -125,7 +138,7 @@ export default function Form(props) {
                     checked={formData.tos}
                     onChange={handleChange}
                 />
-                <button onSubmit={formSubmit}>Submit</button>
+                <button disabled={buttonDisabled} id={"formSubmitBtn"} onSubmit={formSubmit}>Submit</button>
             </StyledForm>
         </FormContainer>
     );
